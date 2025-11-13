@@ -3,7 +3,6 @@ import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { modernApiClient } from "@/lib/modernApiClient";
 import { API_ENDPOINTS } from "@/lib/constants";
-import { AUTH_DEBUG } from "@/lib/authDebug";
 import Cookies from "js-cookie";
 import TestButton from "./TestButton";
 

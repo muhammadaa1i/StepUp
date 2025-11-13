@@ -4,8 +4,6 @@
  * Following SRP: Authentication concerns only
  */
 
-import { EndpointBuilder } from "./builder";
-
 const AUTH_BASE = "/auth";
 
 export const AuthEndpoints = {

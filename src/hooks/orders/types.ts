@@ -1,4 +1,4 @@
-import { Order, OrderItem } from "@/types";
+import { Order } from "@/types";
 
 export interface UseOrdersProps {
   isAuthenticated: boolean;

@@ -1,5 +1,3 @@
-import { Slipper } from "@/types";
-
 export interface PaginationState {
   page: number;
   pageSize: number;

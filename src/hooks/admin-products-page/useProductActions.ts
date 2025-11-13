@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useI18n } from "@/i18n";
 import { toast } from "react-toastify";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { AdminProductService, ProductPayload } from "@/services/adminProductService";
+import { AdminProductService } from "@/services/adminProductService";
 import { Slipper } from "@/types";
 import { ProductFormData, PaginationState } from "./types";
 

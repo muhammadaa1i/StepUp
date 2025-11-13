@@ -4,13 +4,7 @@
 
 import { CacheEntry, RequestConfig, CacheStats, BatchRequest } from "./types";
 import { TIMEOUTS } from "./constants";
-import {
-  getCacheKey,
-  getCacheTTL,
-  setCache,
-  clearCachePattern,
-  getCacheStats,
-} from "./cache";
+import { clearCachePattern, getCacheStats } from "./cache";
 import { AuthManager } from "./auth";
 import { RequestExecutor } from "./request";
 import { executeWithRetries } from "./retry";
