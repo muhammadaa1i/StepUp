@@ -1,0 +1,95 @@
+"use client";
+
+import React, { useEffect, Suspense } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { useI18n } from "@/i18n";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter, useSearchParams } from "next/navigation";
+
+function HomePageContent() {
+  const { t } = useI18n();
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Check if user is admin
+  const isAdmin = user?.is_admin || false;
+  
+  // Handle payment return redirects
+  useEffect(() => {
+    const octoStatus = searchParams.get('octo-status');
+    const transferId = searchParams.get('transfer_id') || 
+                      searchParams.get('octo_payment_UUID') || 
+                      searchParams.get('payment_uuid');
+    
+    // If payment-related parameters are present, redirect to appropriate payment page
+    if (octoStatus || transferId) {
+      
+      if (octoStatus === 'succeeded' || transferId) {
+        // Redirect to success page with all available parameters
+        const params = new URLSearchParams();
+        if (transferId) params.set('transfer_id', transferId);
+        if (octoStatus) params.set('octo-status', octoStatus);
+        
+        router.replace(`/payment/success?${params.toString()}`);
+      } else if (octoStatus === 'failed' || octoStatus === 'cancelled') {
+        // Redirect to failure page
+        const params = new URLSearchParams();
+        if (transferId) params.set('transfer_id', transferId);
+        if (octoStatus) params.set('octo-status', octoStatus);
+        
+        router.replace(`/payment/failure?${params.toString()}`);
+      }
+    }
+  }, [searchParams, router]);
+  
+  return (
+    <>
+      {/* Modern Hero Section */}
+      <section className="relative overflow-hidden bg-linear-to-br from-emerald-600 via-green-600 to-teal-700">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <div className="text-center fade-in">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white leading-tight">
+              {t('home.heroLine1')}
+              <br />
+              <span className="text-gradient bg-linear-to-r from-lime-300 to-emerald-300 bg-clip-text text-transparent">
+                {t('home.heroLine2')}
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl mb-12 text-emerald-50 max-w-3xl mx-auto leading-relaxed">
+              {t('home.heroSubtitle')}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/catalog"
+                className="inline-flex items-center px-8 py-4 bg-white text-emerald-600 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 transform hover:scale-105 shadow-lg"
+              >
+                {t('home.viewCatalog')}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+              {/* Show My Orders button only for authenticated non-admin users */}
+              {isAuthenticated && !isAdmin && (
+                <Link
+                  href="/orders"
+                  className="inline-flex items-center px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-emerald-600 transition-all duration-200"
+                >
+                  {t('home.myOrders')}
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomePageContent />
+    </Suspense>
+  );
+}

@@ -1,0 +1,10 @@
+/* Modal and overlay styles */
+
+/* Ensure modals and dropdowns are visible */
+.modal,
+.dropdown,
+[role="dialog"],
+[role="menu"] {
+  background-color: #ffffff !important;
+  color: #171717 !important;
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- StepUp Shoes logo -->
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">StepUp Logo</title>
+  <desc id="desc">StepUp brand logo with upward arrow and brand name.</desc>
+  <rect width="800" height="800" fill="#FFFFFF"/>
+  
+  <!-- Upward arrow steps representing "Step Up" -->
+  <g transform="translate(400, 200)">
+    <!-- Step 1 (bottom) -->
+    <rect x="-80" y="80" width="40" height="40" fill="#10b981" rx="4"/>
+    <!-- Step 2 (middle) -->
+    <rect x="-20" y="40" width="40" height="40" fill="#059669" rx="4"/>
+    <!-- Step 3 (top) -->
+    <rect x="40" y="0" width="40" height="40" fill="#047857" rx="4"/>
+    <!-- Arrow pointing up -->
+    <path d="M 60 -20 L 80 0 L 60 20 Z" fill="#047857"/>
+  </g>
+  
+  <!-- Brand Name -->
+  <text x="50%" y="450" text-anchor="middle" font-family="'Arial', 'Helvetica', sans-serif" font-size="120" fill="#059669" letter-spacing="10" font-weight="700">STEPUP</text>
+  <!-- Tagline -->
+  <text x="50%" y="550" text-anchor="middle" font-family="'Arial', 'Helvetica', sans-serif" font-size="55" fill="#10b981" letter-spacing="18">SHOES</text>
+</svg>

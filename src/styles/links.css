@@ -1,0 +1,20 @@
+/* Link styles */
+
+/* Remove focus borders and outlines for links */
+a:focus,
+a:focus-visible {
+  outline: none !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+}
+
+/* Link hover states - don't underline on hover */
+a:hover {
+  text-decoration: none;
+}
+
+/* Ensure buttons and links are visible */
+button,
+a {
+  color: inherit;
+}

@@ -1,0 +1,62 @@
+/* Button styles */
+
+/* Remove focus borders and outlines for buttons */
+button:focus,
+button:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible {
+  outline: none !important;
+  border-color: inherit !important;
+  box-shadow: none !important;
+}
+
+/* Better button interactions */
+button,
+[role="button"] {
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Disabled button states */
+button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  color: #6b7280 !important;
+}
+
+/* Button hover states with proper contrast */
+.btn-hover-gray-50:hover {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+.btn-hover-gray-100:hover {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.btn-hover-emerald-700:hover {
+  background-color: #047857 !important;
+  color: #ffffff !important;
+}
+
+.btn-hover-red-50:hover {
+  background-color: #fef2f2 !important;
+  color: #b91c1c !important;
+}
+
+/* Login button emerald green border on hover/focus/active */
+a[href="/auth/login"]:hover,
+a[href="/auth/login"]:focus,
+a[href="/auth/login"]:active {
+  border-color: #10b981 !important;
+  color: #059669 !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+}
