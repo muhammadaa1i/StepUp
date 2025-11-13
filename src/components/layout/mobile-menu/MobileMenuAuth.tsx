@@ -17,20 +17,20 @@ export const MobileMenuAuth: React.FC<MobileMenuAuthProps> = ({
 }) => {
   if (isAuthenticated) {
     return (
-      <div className="border-t pt-3 mt-3">
+      <div className="border-t border-gray-200 pt-4 mt-4">
         <Link
           href="/profile"
           onClick={closeMenu}
-          className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 transition-colors"
         >
-          <User className="h-5 w-5" />
+          <User className="h-5 w-5 shrink-0" />
           <span>{t("common.profile")}</span>
         </Link>
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200 transition-colors"
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut className="h-5 w-5 shrink-0" />
           <span>{t("common.logout")}</span>
         </button>
       </div>
@@ -38,18 +38,18 @@ export const MobileMenuAuth: React.FC<MobileMenuAuthProps> = ({
   }
 
   return (
-    <div className="border-t pt-3 mt-3 space-y-1">
+    <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
       <Link
         href="/auth/login"
         onClick={closeMenu}
-        className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 border-2 border-emerald-500 hover:border-emerald-600"
+        className="block px-4 py-3 rounded-lg text-base font-medium text-center text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 active:bg-emerald-100 border-2 border-emerald-500 hover:border-emerald-600 transition-colors"
       >
         {t("auth.login")}
       </Link>
       <Link
         href="/auth/register"
         onClick={closeMenu}
-        className="block px-3 py-2 rounded-md text-base font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+        className="block px-4 py-3 rounded-lg text-base font-medium text-center bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 transition-colors"
       >
         {t("auth.register")}
       </Link>

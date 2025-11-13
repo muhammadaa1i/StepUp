@@ -49,7 +49,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
       <MobileMenuOverlay onClick={closeMenu} />
       
       {/* Slide-down panel */}
-      <div className="relative z-50 max-h-full overflow-y-auto bg-white shadow-xl animate-[fadeIn_120ms_ease-out] px-2 pt-2 pb-4 space-y-1 sm:px-3">
+      <div className="relative z-50 max-h-full overflow-y-auto bg-white shadow-xl animate-[fadeIn_120ms_ease-out] px-3 pt-3 pb-6 space-y-1">
         {/* Navigation Links */}
         <MobileMenuNavigation
           navigation={navigation}

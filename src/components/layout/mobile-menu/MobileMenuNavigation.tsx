@@ -35,13 +35,13 @@ export const MobileMenuNavigation: React.FC<MobileMenuNavigationProps> = ({
             href={item.href}
             onClick={closeMenu}
             className={cn(
-              "flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium transition-colors",
+              "flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors",
               isActive
                 ? "bg-emerald-100 text-emerald-700"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200"
             )}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-5 w-5 shrink-0" />
             <span>{item.name}</span>
           </Link>
         );
