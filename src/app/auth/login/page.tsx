@@ -1,3 +1,5 @@
+"use client";
+
 import LoginForm from "@/components/auth/LoginForm";
 import "@/lib/authDebug"; // Load auth debugging utilities
 
