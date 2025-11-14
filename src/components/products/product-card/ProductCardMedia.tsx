@@ -64,7 +64,10 @@ export function ProductCardMedia({
           {imageUrls.length > 1 && (
             <>
               <button
-                onClick={onPrevImage}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPrevImage(e);
+                }}
                 onTouchStart={(e) => e.stopPropagation()}
                 aria-label="Previous image"
                 className="absolute left-0.5 sm:left-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 active:bg-black/70 text-white rounded-full p-1.5 sm:p-2 backdrop-blur-sm focus:outline-none text-xs sm:text-sm transition-colors duration-150 touch-manipulation"
@@ -72,7 +75,10 @@ export function ProductCardMedia({
                 ‹
               </button>
               <button
-                onClick={onNextImage}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNextImage(e);
+                }}
                 onTouchStart={(e) => e.stopPropagation()}
                 aria-label="Next image"
                 className="absolute right-0.5 sm:right-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 active:bg-black/70 text-white rounded-full p-1.5 sm:p-2 backdrop-blur-sm focus:outline-none text-xs sm:text-sm transition-colors duration-150 touch-manipulation"

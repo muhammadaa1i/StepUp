@@ -64,7 +64,10 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
           <span className="text-xs text-gray-500">{t("product.quantity")}:</span>
           <div className="flex items-center space-x-1">
             <button
-              onClick={onDecrease}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDecrease(e);
+              }}
               className={`p-1 rounded border text-xs transition-colors ${
                 canDecrease
                   ? "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -76,7 +79,10 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
             </button>
             <span className="w-12 text-center text-xs font-semibold text-gray-900">{cartQuantity || 60}</span>
             <button
-              onClick={onIncrease}
+              onClick={(e) => {
+                e.stopPropagation();
+                onIncrease(e);
+              }}
               className={`p-1 rounded border text-xs transition-colors ${
                 canIncrease
                   ? "border-emerald-300 text-emerald-700 hover:bg-emerald-50"
@@ -94,7 +100,10 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
                 {/* Add to Cart Button */}
           {hasAddToCart && !inCart && !isAdmin && (
         <button
-          onClick={onAddClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddClick();
+          }}
           disabled={!canAddToCart || addPending}
           className={`mt-2 w-full inline-flex items-center justify-center gap-1 rounded-md text-white text-xs sm:text-sm font-medium py-1.5 transition-colors ${
             !canAddToCart || addPending ? "bg-gray-300 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"
