@@ -68,7 +68,7 @@ const Navbar = React.memo(() => {
           <Logo brandName={t("brand.name")} tagline={t("brand.tagline")} />
 
           {/* Desktop Navigation (centered) */}
-          <DesktopNavigation navigation={navigation} pathname={pathname} />
+          <DesktopNavigation navigation={navigation} pathname={pathname} isAdmin={isAdmin} />
 
           {/* User Menu + Profile + Language Switcher (desktop) */}
           <DesktopActions

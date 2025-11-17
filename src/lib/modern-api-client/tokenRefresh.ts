@@ -1,121 +1,76 @@
 /**
- * Token refresh with multi-strategy approach
+ * Simplified token refresh with multi-strategy approach
  */
 
-import Cookies from "js-cookie";
-import { API_BASE_URL } from "../constants";
+import { parseTokensFromResponse } from "./utils/tokenParser";
+import { storeTokens } from "./utils/tokenStorage";
+import { createRefreshStrategies, tryWithTrailingSlash } from "./utils/refreshStrategies";
 
-interface TokenResult {
-  access?: string;
-  refresh?: string;
-}
+// Track failed refresh attempts to prevent loops
+let consecutiveFailures = 0;
+let lastFailureTime = 0;
+const MAX_CONSECUTIVE_FAILURES = 2;
+const FAILURE_RESET_TIME = 30000; // 30 seconds
 
-const parseTokens = async (resp: Response): Promise<TokenResult> => {
-  let body: Record<string, unknown> = {};
-  try {
-    body = await resp.clone().json();
-  } catch {}
-
-  const headers = resp.headers;
-  let access = (body["access_token"] ||
-    body["accessToken"] ||
-    body["access"]) as string | undefined;
-
-  if (!access) {
-    const authH =
-      headers.get("Authorization") || headers.get("authorization");
-    if (authH && /bearer/i.test(authH)) {
-      const parts = authH.split(/\s+/);
-      if (parts.length === 2) access = parts[1];
-    }
+export const refreshAccessToken = async (refreshToken: string): Promise<boolean> => {
+  // Reset counter if enough time has passed
+  if (Date.now() - lastFailureTime > FAILURE_RESET_TIME) {
+    consecutiveFailures = 0;
   }
 
-  let refresh = (body["refresh_token"] ||
-    body["refreshToken"] ||
-    body["refresh"]) as string | undefined;
-  if (!refresh)
-    refresh =
-      headers.get("Refresh-Token") || headers.get("refresh-token") || undefined;
+  // Prevent infinite loops - stop trying after multiple failures
+  if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[Token Refresh] Too many consecutive failures, skipping refresh attempt');
+    }
+    throw new Error("Token refresh disabled due to multiple failures");
+  }
 
-  return { access, refresh };
-};
-
-const buildUrl = (suffix: string) =>
-  new URL(suffix.replace(/^\/+/, "/"), API_BASE_URL + "/").toString();
-
-export const refreshAccessToken = async (
-  refreshToken: string
-): Promise<boolean> => {
-  const strategies: Array<{ label: string; run: () => Promise<Response> }> = [
-    {
-      label: "json-double-field",
-      run: () =>
-        fetch(buildUrl("/auth/refresh"), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({ refresh_token: refreshToken, refreshToken }),
-        }),
-    },
-    {
-      label: "header-refresh-token",
-      run: () =>
-        fetch(buildUrl("/auth/refresh"), {
-          method: "POST",
-          headers: { "Refresh-Token": refreshToken, Accept: "application/json" },
-        }),
-    },
-    {
-      label: "form-urlencoded",
-      run: () =>
-        fetch(buildUrl("/auth/refresh"), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Accept: "application/json",
-          },
-          body: new URLSearchParams({ refresh_token: refreshToken }).toString(),
-        }),
-    },
-  ];
-
+  const strategies = createRefreshStrategies(refreshToken);
   let lastErr: unknown = null;
+
   for (const strat of strategies) {
-    let resp = await strat.run();
-    if (!resp.ok && (resp.status === 404 || resp.status === 422)) {
-      // Try with trailing slash
-      resp = await fetch(buildUrl("/auth/refresh/"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-      });
-    }
+    try {
+      let resp = await strat.run();
+      
+      // Don't retry with trailing slash on 400/401 - these indicate invalid token
+      if (!resp.ok && (resp.status === 404 || resp.status === 422)) {
+        resp = await tryWithTrailingSlash();
+      }
 
-    if (resp.ok) {
-      const { access, refresh } = await parseTokens(resp);
-      const cookieOptions = {
-        sameSite: "lax" as const,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      };
-      if (access)
-        Cookies.set("access_token", access, { ...cookieOptions, expires: 1 });
-      if (refresh)
-        Cookies.set("refresh_token", refresh, { ...cookieOptions, expires: 30 });
-      if (access || refresh) return !!access;
-
-      lastErr = new Error(
-        `Refresh strategy '${strat.label}' returned no tokens`
-      );
-      continue;
-    } else {
-      lastErr = new Error(
-        `Refresh strategy '${strat.label}' failed status ${resp.status}`
-      );
+      if (resp.ok) {
+        const tokens = await parseTokensFromResponse(resp);
+        const stored = storeTokens(tokens);
+        
+        if (stored && tokens.access) {
+          // Success - reset failure counter
+          consecutiveFailures = 0;
+          return true;
+        }
+        
+        lastErr = new Error(`Refresh strategy '${strat.label}' returned no tokens`);
+        continue;
+      } else {
+        // Don't log 401/400 as they're expected when token is invalid
+        if (resp.status !== 401 && resp.status !== 400) {
+          console.error(`[Token Refresh] Strategy '${strat.label}' failed with status ${resp.status}`);
+        }
+        lastErr = new Error(`Refresh strategy '${strat.label}' failed status ${resp.status}`);
+        // If token is clearly invalid, don't try other strategies to reduce noise
+        if (resp.status === 400 || resp.status === 401) {
+          break;
+        }
+        continue;
+      }
+    } catch (error) {
+      lastErr = error;
       continue;
     }
   }
 
+  // All strategies failed
+  consecutiveFailures++;
+  lastFailureTime = Date.now();
+  
   throw lastErr || new Error("All refresh strategies failed");
 };

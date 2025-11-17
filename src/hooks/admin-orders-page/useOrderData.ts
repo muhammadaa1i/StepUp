@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useI18n } from "@/i18n";
 import { Order, SearchParams } from "@/types";
 import { PAGINATION } from "@/lib/constants";
@@ -24,6 +24,10 @@ export function useOrderData() {
     skip: 0,
     limit: PAGINATION.DEFAULT_LIMIT,
   });
+  
+  const lastErrorRef = useRef<number>(0);
+  const shownAuthErrorRef = useRef<boolean>(false); // Track if auth error was already shown
+  const ERROR_THROTTLE = 3000; // Only show error once every 3 seconds
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -51,10 +55,29 @@ export function useOrderData() {
         limit,
         totalPages: computedTotalPages,
       });
-    } catch (error) {
+      
+      // Reset auth error flag on successful fetch
+      shownAuthErrorRef.current = false;
+    } catch (error: any) {
       console.error("Error fetching orders:", error);
-      toast.error(t("admin.orders.toasts.loadError"));
       setOrders([]);
+      
+      // Handle 401 auth errors specially - only show once per session
+      if (error?.status === 401) {
+        if (!shownAuthErrorRef.current) {
+          shownAuthErrorRef.current = true;
+          toast.error(t("admin.orders.toasts.authError") || t("errors.authenticationRequired"));
+        }
+        // Silently fail on subsequent attempts
+        return;
+      }
+      
+      // For other errors, throttle to prevent duplicates
+      const now = Date.now();
+      if (now - lastErrorRef.current > ERROR_THROTTLE) {
+        lastErrorRef.current = now;
+        toast.error(t("admin.orders.toasts.loadError"));
+      }
     } finally {
       setIsLoading(false);
     }

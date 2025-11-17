@@ -10,6 +10,7 @@ export interface UseOrdersResult {
   filteredOrders: Order[];
   isLoading: boolean;
   fetchOrders: () => Promise<void>;
+  authError: boolean;
 }
 
 export interface RawOrderItem {

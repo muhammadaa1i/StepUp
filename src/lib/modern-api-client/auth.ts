@@ -1,15 +1,12 @@
 /**
- * Authentication state management
+ * Ultra-simplified authentication manager
  */
 
-import Cookies from "js-cookie";
 import { NavigationTracker } from "./navigation";
-import {
-  REFRESH_COOLDOWN,
-  NAVIGATION_GRACE_PERIOD,
-  AUTH_INVALIDATION_COOLDOWN,
-} from "./constants";
-import { refreshAccessToken } from "./tokenRefresh";
+import { REFRESH_COOLDOWN, NAVIGATION_GRACE_PERIOD, AUTH_INVALIDATION_COOLDOWN } from "./constants";
+import { attemptTokenRefresh, shouldAttemptRefresh, getRefreshToken } from "./utils/tokenRefreshHelpers";
+import { isInPaymentFlow, shouldRedirectToLogin } from "./utils/paymentFlowDetector";
+import { clearAuthData, restoreUserBackup } from "./utils/authCleanup";
 
 export class AuthManager {
   private refreshPromise: Promise<boolean> | null = null;
@@ -20,118 +17,96 @@ export class AuthManager {
   async attemptRefresh(endpoint: string): Promise<boolean> {
     if (this.refreshPromise) return this.refreshPromise;
 
-    const refreshToken = Cookies.get("refresh_token");
-    if (!refreshToken) return false;
-
-    const canAttemptRefresh = () =>
-      Date.now() - this.lastRefreshFailAt > REFRESH_COOLDOWN;
-
-    if (!canAttemptRefresh() || endpoint.includes("/auth/refresh")) {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) {
+      // No refresh token - don't attempt refresh
       return false;
     }
 
-    this.refreshPromise = (async () => {
-      try {
-        const success = await refreshAccessToken(refreshToken);
-        return success;
-      } catch {
-        this.lastRefreshFailAt = Date.now();
-        this.handleRefreshFailure();
-        return false;
-      } finally {
-        const p = this.refreshPromise;
-        setTimeout(() => {
-          if (this.refreshPromise === p) this.refreshPromise = null;
-        }, 50);
-      }
-    })();
+    if (!shouldAttemptRefresh(this.lastRefreshFailAt, REFRESH_COOLDOWN, endpoint)) {
+      return false;
+    }
 
+    // Prevent refresh attempts on catalog/product endpoints when not authenticated
+    // UNLESS we're on an admin page where these endpoints need auth
+    const isAdminPage = typeof window !== "undefined" && 
+                        window.location.pathname.startsWith("/admin");
+    
+    const isPublicEndpoint = !isAdminPage && (
+      endpoint.includes('/products') || 
+      endpoint.includes('/catalog') ||
+      endpoint.includes('/slippers')
+    );
+    
+    if (isPublicEndpoint) {
+      // Public endpoints shouldn't trigger refresh - user is just browsing
+      return false;
+    }
+
+    this.refreshPromise = this.executeRefresh(refreshToken);
     return this.refreshPromise;
   }
 
+  private async executeRefresh(refreshToken: string): Promise<boolean> {
+    try {
+      const success = await attemptTokenRefresh(refreshToken);
+      return success;
+    } catch {
+      this.lastRefreshFailAt = Date.now();
+      this.handleRefreshFailure();
+      return false;
+    } finally {
+      const p = this.refreshPromise;
+      setTimeout(() => {
+        if (this.refreshPromise === p) this.refreshPromise = null;
+      }, 50);
+    }
+  }
+
   private handleRefreshFailure(): void {
-    const isPaymentFlow =
-      typeof window !== "undefined" &&
-      (window.location.pathname.includes("/payment/") ||
-        window.location.search.includes("transfer_id") ||
-        window.location.search.includes("payment_uuid") ||
-        window.location.search.includes("octo_payment_UUID") ||
-        window.location.search.includes("octo-status"));
+    const isPayment = isInPaymentFlow();
+    const isNavigating = this.isCurrentlyNavigating();
 
-    const isNavigating =
-      typeof window !== "undefined" &&
-      (this.navigationTracker.isNavigatingNow() ||
-        this.navigationTracker.isHardRefresh() ||
-        this.navigationTracker.isRecentNavigation(NAVIGATION_GRACE_PERIOD));
-
-    if (!isPaymentFlow && !isNavigating) {
-      this.clearAuthData();
+    if (!isPayment && !isNavigating) {
+      clearAuthData();
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("auth:logout"));
       }
     } else {
-      this.tryRestoreUserBackup();
+      restoreUserBackup();
     }
+  }
+
+  private isCurrentlyNavigating(): boolean {
+    return this.navigationTracker.isNavigatingNow() ||
+      this.navigationTracker.isHardRefresh() ||
+      this.navigationTracker.isRecentNavigation(NAVIGATION_GRACE_PERIOD);
   }
 
   invalidateAuth(): void {
-    const isRecentNavigation = this.navigationTracker.isRecentNavigation(
-      NAVIGATION_GRACE_PERIOD
-    );
-    const isNavigatingNow = this.navigationTracker.isNavigatingNow();
-    const isHardRefresh = this.navigationTracker.isHardRefresh();
+    const canInvalidate = !this.navigationTracker.isRecentNavigation(NAVIGATION_GRACE_PERIOD) &&
+      !this.navigationTracker.isNavigatingNow() &&
+      !this.navigationTracker.isHardRefresh() &&
+      !this.hasInvalidatedAuth;
 
-    if (
-      !isRecentNavigation &&
-      !isNavigatingNow &&
-      !isHardRefresh &&
-      !this.hasInvalidatedAuth
-    ) {
-      this.hasInvalidatedAuth = true;
-      this.clearAuthData();
+    if (canInvalidate) {
+      this.performInvalidation();
+    }
+  }
 
-      if (
-        typeof window !== "undefined" &&
-        !window.location.pathname.includes("/auth/") &&
-        !window.location.pathname.includes("/login")
-      ) {
-        setTimeout(() => {
-          window.location.href =
-            "/auth/login?message=Session expired, please log in again";
-        }, 500);
-      }
+  private performInvalidation(): void {
+    this.hasInvalidatedAuth = true;
+    clearAuthData();
 
+    if (typeof window !== "undefined" && shouldRedirectToLogin()) {
       setTimeout(() => {
-        this.hasInvalidatedAuth = false;
-      }, AUTH_INVALIDATION_COOLDOWN);
+        window.location.href = "/auth/login?message=Session expired, please log in again";
+      }, 500);
     }
-  }
 
-  private clearAuthData(): void {
-    Cookies.remove("access_token");
-    Cookies.remove("refresh_token");
-    Cookies.remove("user");
-    try {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("refresh_token");
-    } catch {}
-  }
-
-  private tryRestoreUserBackup(): void {
-    const userBackup = sessionStorage.getItem("userBackup");
-    if (userBackup) {
-      try {
-        const cookieOptions = {
-          sameSite: "strict" as const,
-          secure: process.env.NODE_ENV === "production",
-        };
-        Cookies.set("user", userBackup, {
-          ...cookieOptions,
-          expires: 7,
-        });
-      } catch {}
-    }
+    setTimeout(() => {
+      this.hasInvalidatedAuth = false;
+    }, AUTH_INVALIDATION_COOLDOWN);
   }
 
   getLastRefreshFailTime(): number {

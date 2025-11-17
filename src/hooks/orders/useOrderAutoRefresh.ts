@@ -9,9 +9,12 @@ import { useEffect } from "react";
 export function useOrderAutoRefresh(
   fetchOrders: () => Promise<void>,
   lastFetchRef: React.MutableRefObject<number>,
-  cooldownMs: number = 15000
+  cooldownMs: number = 15000,
+  enabled: boolean = true
 ) {
   useEffect(() => {
+    if (!enabled) return;
+
     const onFocus = () => {
       const now = Date.now();
       if (now - lastFetchRef.current >= cooldownMs) {
@@ -30,5 +33,5 @@ export function useOrderAutoRefresh(
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [fetchOrders, lastFetchRef, cooldownMs]);
+  }, [fetchOrders, lastFetchRef, cooldownMs, enabled]);
 }

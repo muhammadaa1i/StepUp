@@ -37,12 +37,34 @@ const redirectToLogin = (): void => {
   }
 };
 
+const isPublicEndpoint = (endpoint: string): boolean => {
+  // Only true public endpoints that don't need auth at all
+  if (endpoint.includes("/products") || endpoint.includes("/catalog")) {
+    return true;
+  }
+  
+  // Admin accessing these endpoints should trigger refresh
+  if (isAdminPage() && (endpoint.includes("/slippers") || endpoint.includes("/categories"))) {
+    return false;
+  }
+  
+  // Regular users browsing products/categories
+  return endpoint.includes("/slippers") || endpoint.includes("/categories/");
+};
+
 export const handle401 = async (
   authManager: AuthManager,
   endpoint: string,
   options: RequestOptions,
   retryFn: (opts: RequestOptions) => Promise<unknown>
 ): Promise<unknown> => {
+  // Don't attempt refresh on public endpoints - user is just browsing
+  if (isPublicEndpoint(endpoint)) {
+    const error = new Error("Authentication required. Please log in again.");
+    (error as any).status = 401;
+    throw error;
+  }
+
   const hasRefreshToken = getToken("refresh_token");
 
   if (hasRefreshToken && !options._retry) {

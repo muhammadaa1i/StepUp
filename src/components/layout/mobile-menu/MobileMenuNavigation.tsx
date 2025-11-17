@@ -8,6 +8,7 @@ interface MobileMenuNavigationProps {
   navigation: NavigationItem[];
   pathname: string | null;
   closeMenu: () => void;
+  isAdmin?: boolean;
 }
 
 const iconMap = {
@@ -20,6 +21,7 @@ export const MobileMenuNavigation: React.FC<MobileMenuNavigationProps> = ({
   navigation,
   pathname,
   closeMenu,
+  isAdmin,
 }) => {
   return (
     <>
@@ -27,7 +29,7 @@ export const MobileMenuNavigation: React.FC<MobileMenuNavigationProps> = ({
         const Icon = iconMap[item.icon];
         const isActive =
           item.href === "/admin"
-            ? pathname?.startsWith("/admin")
+            ? pathname?.startsWith("/admin") || isAdmin // Keep green if admin, even on other pages
             : pathname === item.href;
         return (
           <Link

@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import ruDict from './locales/ru';
-import uzDict from './locales/uz';
+import ruDict from './locales/ru/index';
+import uzDict from './locales/uz/index';
 
 export type Locale = 'ru' | 'uz';
 

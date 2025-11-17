@@ -36,12 +36,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     }
   }, [isLoading, user, router]);
 
-  // Prefetch admin data for faster navigation
-  useEffect(() => {
-    if (user?.is_admin) {
-      AdminPrefetch.prefetchAll();
-    }
-  }, [user?.is_admin]);
+  // Prefetching removed: Each page loads its own data efficiently
+  // This avoids duplicate requests and reduces unnecessary network traffic
 
   if (isLoading) {
     return (

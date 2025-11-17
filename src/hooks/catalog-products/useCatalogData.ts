@@ -46,7 +46,7 @@ export function useCatalogData(t: (key: string) => string, initialProducts: Slip
         cache: true,
         ttl: 180000, // 3 minutes cache
         timeout: 4000, // Faster timeout
-        retries: 1,
+        retries: 0, // No retries to avoid rate limiting (429)
       });
       if (!mountedRef.current) return;
       const arrayData = extractArray(response);
@@ -72,6 +72,20 @@ export function useCatalogData(t: (key: string) => string, initialProducts: Slip
     } catch (err: unknown) {
       if ((err as { name?: string }).name === "AbortError") return;
       const apiErr = err as { status?: number; message?: string };
+      
+      // Handle rate limiting silently - show friendly message
+      if (apiErr.status === 429) {
+        console.warn("Rate limit reached, please wait a moment");
+        setErrorStatus(429);
+        setHasError(true);
+        setErrorMessage(t("errors.tooManyRequests") || "Too many requests. Please wait a moment and try again.");
+        toast.warning(t("errors.tooManyRequests") || "Too many requests. Please wait a moment.");
+        // Don't clear products on rate limit - keep showing cached data
+        setIsLoading(false);
+        setIsInitialLoading(false);
+        return;
+      }
+      
       console.error("Error fetching products:", err);
       setErrorStatus(apiErr.status);
       setHasError(true);

@@ -1,12 +1,11 @@
 /**
- * Admin Product Service
- * Handles admin product management operations
- * Following SRP: Admin product CRUD and image management
+ * Simplified admin product service
  */
 
 import modernApiClient from "@/lib/modernApiClient";
 import { ProductEndpoints } from "@/lib/api/endpoints";
 import { Slipper } from "@/types";
+import { parseProductListResponse, ProductListResult } from "./utils/productParser";
 
 export interface ProductListParams {
   skip?: number;
@@ -14,12 +13,6 @@ export interface ProductListParams {
   page?: number;
   include_images?: boolean;
   [k: string]: unknown;
-}
-
-export interface ProductListResult {
-  items: Slipper[];
-  total: number;
-  totalPages: number;
 }
 
 export interface ProductPayload {
@@ -35,51 +28,20 @@ export const AdminProductService = {
     const resp = await modernApiClient.get(
       ProductEndpoints.LIST,
       params as Record<string, unknown>,
-      { cache: true, timeout: 5000, retries: 1 } // Enable caching for speed
+      { cache: true, timeout: 5000, retries: 1 }
     );
 
-    const raw: unknown = (resp as { data?: unknown })?.data ?? resp;
-    type Wrap = {
-      items?: Slipper[];
-      data?: Slipper[];
-      total?: number | string;
-      pages?: number | string;
-      total_pages?: number | string;
-    };
-
-    let items: Slipper[] = [];
-    let total = 0;
-    let totalPages = 1;
-
-    if (Array.isArray(raw)) {
-      items = raw as Slipper[];
-      total = items.length;
-      totalPages = 1;
-    } else if (raw && typeof raw === "object") {
-      const w = raw as Wrap;
-      if (Array.isArray(w.items)) items = w.items as Slipper[];
-      else if (Array.isArray(w.data)) items = w.data as Slipper[];
-      total = w.total != null ? Number(w.total) : items.length;
-      totalPages = Number(
-        w.pages ?? 
-        w.total_pages ?? 
-        Math.ceil(total / Number(params.limit || 10))
-      ) || 1;
-    }
-
-    return { items, total, totalPages };
+    return parseProductListResponse(resp, params);
   },
 
   async create(payload: ProductPayload): Promise<Slipper> {
     const resp = await modernApiClient.post(ProductEndpoints.CREATE, payload);
-    const data = (resp as { data?: Slipper })?.data ?? (resp as Slipper);
-    return data as Slipper;
+    return (resp as { data?: Slipper })?.data ?? (resp as Slipper);
   },
 
   async update(id: number, payload: ProductPayload): Promise<Slipper> {
     const resp = await modernApiClient.put(ProductEndpoints.UPDATE(id), payload);
-    const data = (resp as { data?: Slipper })?.data ?? (resp as Slipper);
-    return data as Slipper;
+    return (resp as { data?: Slipper })?.data ?? (resp as Slipper);
   },
 
   async remove(id: number): Promise<void> {
@@ -98,8 +60,7 @@ export const AdminProductService = {
 
   async toggleAvailable(id: number, is_available: boolean): Promise<Slipper> {
     const resp = await modernApiClient.put(ProductEndpoints.UPDATE(id), { is_available });
-    const data = (resp as { data?: Slipper })?.data ?? (resp as Slipper);
-    return data as Slipper;
+    return (resp as { data?: Slipper })?.data ?? (resp as Slipper);
   },
 
   async getImages(productId: number): Promise<Array<{
@@ -113,14 +74,7 @@ export const AdminProductService = {
       undefined,
       { cache: false, force: true }
     );
-    const data = (resp as {
-      data?: Array<{
-        id: number;
-        image_url: string;
-        is_primary?: boolean;
-        alt_text?: string;
-      }>;
-    })?.data ?? resp;
+    const data = (resp as { data?: Array<any> })?.data ?? resp;
     return (Array.isArray(data) ? data : []) as Array<{
       id: number;
       image_url: string;
@@ -130,14 +84,10 @@ export const AdminProductService = {
   },
 
   async deleteImage(productId: number, imageId: number): Promise<void> {
-    await modernApiClient.delete(
-      ProductEndpoints.DELETE_IMAGE(productId, imageId)
-    );
+    await modernApiClient.delete(ProductEndpoints.DELETE_IMAGE(productId, imageId));
   },
 
   async setPrimaryImage(productId: number, imageId: number): Promise<void> {
-    await modernApiClient.put(
-      ProductEndpoints.SET_PRIMARY_IMAGE(productId, imageId)
-    );
+    await modernApiClient.put(ProductEndpoints.SET_PRIMARY_IMAGE(productId, imageId));
   }
 };

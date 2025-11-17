@@ -22,17 +22,29 @@ class ModernApiClient {
   ): Promise<unknown> {
     const { retries = 1, timeout = TIMEOUTS.get } = config;
 
+    // Create a unique key for request deduplication
+    const requestKey = `${endpoint}:${JSON.stringify(params || {})}`;
+    
+    // Return existing pending request if one exists (deduplication)
+    if (this.pendingRequests.has(requestKey)) {
+      return this.pendingRequests.get(requestKey)!;
+    }
+
     const requestPromise = executeWithRetries(
       () => this.requestExecutor.makeRequest(endpoint, { params, timeout }),
       retries,
       timeout
     );
 
+    // Store pending request
+    this.pendingRequests.set(requestKey, requestPromise);
+
     try {
       const data = await requestPromise;
       return data;
     } finally {
-      // Cleanup
+      // Cleanup pending request after completion
+      this.pendingRequests.delete(requestKey);
     }
   }
 

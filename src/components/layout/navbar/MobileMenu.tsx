@@ -55,6 +55,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           navigation={navigation}
           pathname={pathname}
           closeMenu={closeMenu}
+          isAdmin={isAdmin}
         />
 
         {/* Cart Link */}

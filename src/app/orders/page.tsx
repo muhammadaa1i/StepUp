@@ -17,7 +17,7 @@ import { formatOrderDate, formatOrderPrice } from "@/lib/orderHelpers";
 export default function OrdersPage() {
   const { isAuthenticated } = useAuth();
   const { t, locale } = useI18n();
-  const { filteredOrders, isLoading } = useOrders(isAuthenticated, t);
+  const { filteredOrders, isLoading, authError } = useOrders(isAuthenticated, t);
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -43,7 +43,7 @@ export default function OrdersPage() {
     setSelectedOrder(null);
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || authError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

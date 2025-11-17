@@ -1,0 +1,86 @@
+export const orders = {
+  about: 'Подробнее',
+  details: {
+    title: 'Детали заказа',
+    orderDate: 'Дата заказа',
+    paymentMethod: 'Способ оплаты',
+    shippingAddress: 'Адрес доставки',
+    totalItems: 'Всего товаров',
+    customerName: 'Имя клиента',
+    orderItems: 'Товары заказа',
+    size: 'Размер',
+    quantity: 'Количество',
+    unitPrice: 'Цена',
+    notes: 'Примечания',
+    totalAmount: 'Итоговая сумма',
+  },
+  status: {
+    created: 'Создан',
+    pending: 'Ожидает',
+    paid: 'Оплачен',
+    failed: 'Ошибка',
+    cancelled: 'Отменён',
+    refunded: 'Возвращено',
+    confirmed: 'Подтверждён',
+    processing: 'Обрабатывается',
+    shipped: 'Отправлен',
+    delivered: 'Доставлен'
+  },
+  itemCount: '{count} товар(ов)',
+  refund: {
+    request: 'Возврат',
+    requesting: 'Запрашиваем...',
+    requestSuccess: 'Запрос на возврат отправлен',
+    requestError: 'Ошибка отправки запроса на возврат',
+    confirmTitle: 'Подтвердить возврат',
+    confirmMessage: 'Вы уверены, что хотите запросить возврат для этого заказа?',
+    amount: 'Сумма',
+    orderNumber: 'Заказ',
+    pendingImplementation: 'Система возвратов внедряется. Пожалуйста, обратитесь в поддержку для ручной обработки.',
+    requestReceived: 'Запрос на возврат получен. С вами свяжутся в течение 24 часов.',
+    requestSent: 'Запрос на возврат отправлен администратору. С вами свяжутся в течение 24 часов.',
+    confirmSubtitle: 'Обработка запроса на возврат',
+    warningTitle: 'Важное уведомление',
+    orderDetails: 'Детали заказа',
+    itemCount: 'Товаров',
+    refundAmount: 'Сумма возврата',
+    processingNotice: 'Возврат будет обработан в течение 24-48 часов',
+    confirmButton: 'Подтвердить возврат',
+    contactModal: {
+      title: 'Возврат средств',
+      message: 'Если вы хотите вернуть деньги, свяжитесь с администратором',
+      contactInfo: 'Контактная информация:',
+      phone: 'Телефон:',
+      telegram: 'Telegram:',
+      closeButton: 'Закрыть'
+    }
+  }
+} as const;
+
+export const ordersPage = {
+  title: 'Мои заказы',
+  subtitle: 'Отслеживайте статус ваших заказов и просматривайте историю покупок',
+  historyUnavailable: 'История заказов недоступна',
+  authRequiredTitle: 'Необходима авторизация',
+  authRequiredMessage: 'Войдите в систему для просмотра ваших заказов',
+  notFound: 'Заказы не найдены',
+  noneYet: 'У вас пока нет заказов',
+  tryAdjustSearch: 'Попробуйте изменить критерии поиска',
+  startShopping: 'Начните покупки в нашем каталоге',
+  resetFilters: 'Сбросить фильтры',
+  goToCatalog: 'Перейти в каталог',
+  status: {
+    CREATED: 'Создан',
+    PENDING: 'Ожидает',
+    PAID: 'Оплачен',
+    FAILED: 'Ошибка',
+    CANCELLED: 'Отменён',
+    REFUNDED: 'Возвращено',
+    confirmed: 'Подтверждён',
+    pending: 'Ожидает',
+    processing: 'Обрабатывается',
+    shipped: 'Отправлен',
+    delivered: 'Доставлен',
+    cancelled: 'Отменён'
+  }
+} as const;

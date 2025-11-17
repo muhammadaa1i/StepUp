@@ -58,8 +58,8 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
       </div>
 
       {/* Quantity Controls */}
-                {/* Quantity Controls (compact) */}
-          {inCart && hasAddToCart && !isAdmin && (
+      {/* Quantity Controls (compact) */}
+      {inCart && hasAddToCart && !isAdmin && (
         <div className="mt-1 flex items-center justify-between">
           <span className="text-xs text-gray-500">{t("product.quantity")}:</span>
           <div className="flex items-center space-x-1">
@@ -68,11 +68,10 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
                 e.stopPropagation();
                 onDecrease(e);
               }}
-              className={`p-1 rounded border text-xs transition-colors ${
-                canDecrease
+              className={`p-1 rounded border text-xs transition-colors ${canDecrease
                   ? "border-gray-300 text-gray-700 hover:bg-gray-50"
                   : "border-gray-200 text-gray-400 cursor-not-allowed opacity-50"
-              }`}
+                }`}
               disabled={!canDecrease}
             >
               <Minus className="h-3 w-3" />
@@ -83,11 +82,10 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
                 e.stopPropagation();
                 onIncrease(e);
               }}
-              className={`p-1 rounded border text-xs transition-colors ${
-                canIncrease
+              className={`p-1 rounded border text-xs transition-colors ${canIncrease
                   ? "border-emerald-300 text-emerald-700 hover:bg-emerald-50"
                   : "border-gray-200 text-gray-400 cursor-not-allowed opacity-50"
-              }`}
+                }`}
               disabled={!canIncrease}
               title={!canIncrease ? t("product.insufficientStock") : undefined}
             >
@@ -97,17 +95,16 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
         </div>
       )}
 
-                {/* Add to Cart Button */}
-          {hasAddToCart && !inCart && !isAdmin && (
+      {/* Add to Cart Button */}
+      {hasAddToCart && !inCart && !isAdmin && (
         <button
           onClick={(e) => {
             e.stopPropagation();
             onAddClick();
           }}
           disabled={!canAddToCart || addPending}
-          className={`mt-2 w-full inline-flex items-center justify-center gap-1 rounded-md text-white text-xs sm:text-sm font-medium py-1.5 transition-colors ${
-            !canAddToCart || addPending ? "bg-gray-300 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"
-          }`}
+          className={`mt-2 w-full inline-flex items-center justify-center gap-1 rounded-md text-white text-xs sm:text-sm font-medium py-1.5 transition-colors ${!canAddToCart || addPending ? "bg-gray-300 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"
+            }`}
           title={
             !canAddToCart
               ? t("product.insufficientStockTooltip", { min: "60" })

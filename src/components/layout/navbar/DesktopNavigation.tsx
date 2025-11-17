@@ -7,6 +7,7 @@ import { NavigationItem } from "../navbar-components/types";
 interface DesktopNavigationProps {
   navigation: NavigationItem[];
   pathname: string | null;
+  isAdmin?: boolean;
 }
 
 const iconMap = {
@@ -18,6 +19,7 @@ const iconMap = {
 export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
   navigation,
   pathname,
+  isAdmin,
 }) => {
   return (
     <div className="hidden md:flex items-center">
@@ -27,7 +29,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
         const Icon = iconMap[item.icon];
         const isActive =
           item.href === "/admin"
-            ? pathname?.startsWith("/admin")
+            ? pathname?.startsWith("/admin") || isAdmin // Keep green if admin, even on other pages
             : pathname === item.href;
         return (
           <Link

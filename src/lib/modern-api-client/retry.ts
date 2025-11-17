@@ -18,13 +18,13 @@ export const executeWithRetries = async (
     } catch (error: unknown) {
       if (i === retries) throw error;
 
-      // Don't retry on client errors
+      // Don't retry on client errors or rate limiting
       if (
         error &&
         typeof error === "object" &&
         "status" in error &&
         (error as { status: number }).status &&
-        [400, 401, 403, 404, 422].includes(
+        [400, 401, 403, 404, 422, 429].includes(
           (error as { status: number }).status
         )
       ) {

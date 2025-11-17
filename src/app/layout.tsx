@@ -11,6 +11,7 @@ import Footer from "@/components/layout/Footer";
 import { ConfirmDialogProvider } from "@/components/ui/ConfirmDialog";
 import { I18nProvider } from "@/i18n";
 import GlobalSWRConfig from "@/lib/swrConfig";
+import "@/lib/consoleFilter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

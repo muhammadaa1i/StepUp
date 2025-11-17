@@ -14,19 +14,22 @@ export default function useOrders(
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState(false);
   const lastFetchRef = useRef<number>(0);
 
   // Order fetching logic
   const { fetchOrders } = useOrderFetching(
+    isAuthenticated,
     setOrders,
     setFilteredOrders,
     setIsLoading,
     lastFetchRef,
-    t
+    t,
+    setAuthError
   );
 
   // Auto-refresh on focus/visibility with 15s cooldown
-  useOrderAutoRefresh(fetchOrders, lastFetchRef, 15000);
+  useOrderAutoRefresh(fetchOrders, lastFetchRef, 15000, isAuthenticated);
 
   // Initial fetch when authenticated
   useEffect(() => {
@@ -45,5 +48,6 @@ export default function useOrders(
     filteredOrders,
     isLoading,
     fetchOrders,
+    authError,
   };
 }

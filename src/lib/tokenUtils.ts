@@ -1,20 +1,47 @@
 import Cookies from "js-cookie";
 
+function decodeJwt(token: string): { exp?: number; iat?: number } | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const payload = parts[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const json = atob(payload.padEnd(payload.length + (4 - (payload.length % 4)) % 4, "="));
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function isExpiredJwt(token: string, skewMs = 30_000): boolean {
+  const data = decodeJwt(token);
+  if (!data || !data.exp) return false; // If we can't decode, don't treat as expired here
+  const nowMs = Date.now();
+  const expMs = data.exp * 1000;
+  return expMs <= nowMs + skewMs; // Consider near-expiry as expired to avoid race
+}
+
 export function hasValidToken(): boolean {
   if (typeof window === "undefined") return false;
-  
+
   const accessToken = Cookies.get("access_token");
-  
+
   // At minimum, we need an access token
   if (!accessToken) {
     return false;
   }
-  
+
   // Basic token format validation (should be a JWT-like string)
   if (accessToken.length < 10 || !accessToken.includes('.')) {
     return false;
   }
-  
+
+  // Prevent calls with clearly expired tokens
+  if (isExpiredJwt(accessToken)) {
+    return false;
+  }
+
   return true;
 }
 

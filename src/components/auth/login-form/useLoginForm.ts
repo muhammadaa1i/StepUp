@@ -36,11 +36,27 @@ export function useLoginForm({ t }: UseLoginFormOptions) {
         form.clearErrors();
         await login(data);
         router.push("/");
-      } catch {
-        setLoginError("Неверный логин или пароль");
+      } catch (error: unknown) {
+        // Extract error message from various formats
+        let errorMessage = t("auth.toasts.loginInvalid");
+        
+        if (error instanceof Error) {
+          // Check if the error message indicates incorrect credentials
+          const msg = error.message.toLowerCase();
+          if (msg.includes("incorrect") || msg.includes("неверн") || msg.includes("noto'g'ri")) {
+            errorMessage = t("auth.serverMessages.incorrectCredentials");
+          } else if (msg.includes("unauthorized") || msg.includes("401")) {
+            errorMessage = t("auth.serverMessages.incorrectCredentials");
+          } else {
+            // Use the error message directly if it's meaningful
+            errorMessage = error.message;
+          }
+        }
+        
+        setLoginError(errorMessage);
       }
     },
-    [login, router, form]
+    [login, router, form, t]
   );
 
   const handleInputChange = useCallback(() => {

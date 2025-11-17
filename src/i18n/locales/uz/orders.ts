@@ -1,0 +1,86 @@
+export const orders = {
+  about: 'Batafsil',
+  details: {
+    title: 'Buyurtma tafsilotlari',
+    orderDate: 'Buyurtma sanasi',
+    paymentMethod: 'To\'lov usuli',
+    shippingAddress: 'Yetkazib berish manzili',
+    totalItems: 'Jami mahsulotlar',
+    customerName: 'Mijoz nomi',
+    orderItems: 'Buyurtma mahsulotlari',
+    size: 'O\'lcham',
+    quantity: 'Miqdor',
+    unitPrice: 'Narx',
+    notes: 'Izohlar',
+    totalAmount: 'Jami summa',
+  },
+  status: {
+    created: 'Yaratildi',
+    pending: 'Kutilmoqda',
+    paid: 'To\'landi',
+    failed: 'Xato',
+    cancelled: 'Bekor qilindi',
+    refunded: 'Qaytarildi',
+    confirmed: 'Tasdiqlandi',
+    processing: 'Qayta ishlanmoqda',
+    shipped: 'Yuborildi',
+    delivered: 'Yetkazildi'
+  },
+  itemCount: '{count} ta mahsulot',
+  refund: {
+    request: 'Qaytarish',
+    requesting: 'So\'rov yuborilmoqda...',
+    requestSuccess: 'Qaytarish so\'rovi yuborildi',
+    requestError: 'Qaytarish so\'rovini yuborishda xato',
+    confirmTitle: 'Qaytarishni tasdiqlash',
+    confirmMessage: 'Ushbu buyurtma uchun qaytarishni so\'ramoqchimisiz?',
+    amount: 'Summa',
+    orderNumber: 'Buyurtma',
+    pendingImplementation: 'Qaytarish tizimi joriy qilinmoqda. Iltimos, qo\'lda qayta ishlash uchun qo\'llab-quvvatlash xizmatiga murojaat qiling.',
+    requestReceived: 'Qaytarish so\'rovi qabul qilindi. Siz bilan 24 soat ichida bog\'lanamiz.',
+    requestSent: 'Qaytarish so\'rovi administratorga yuborildi. Siz bilan 24 soat ichida bog\'lanamiz.',
+    confirmSubtitle: 'Qaytarish so\'rovini qayta ishlash',
+    warningTitle: 'Muhim xabarnoma',
+    orderDetails: 'Buyurtma tafsilotlari',
+    itemCount: 'Mahsulotlar',
+    refundAmount: 'Qaytarish summasi',
+    processingNotice: 'Qaytarish 24-48 soat ichida qayta ishlanadi',
+    confirmButton: 'Qaytarishni tasdiqlash',
+    contactModal: {
+      title: 'Pulni qaytarish',
+      message: 'Agar pulni qaytarishni istasangiz, administrator bilan bog\'laning',
+      contactInfo: 'Aloqa ma\'lumotlari:',
+      phone: 'Telefon:',
+      telegram: 'Telegram:',
+      closeButton: 'Yopish'
+    }
+  }
+} as const;
+
+export const ordersPage = {
+  title: 'Mening buyurtmalarim',
+  subtitle: 'Buyurtmalaringiz holati va xaridlar tarixini kuzating',
+  historyUnavailable: 'Buyurtmalar tarixi mavjud emas',
+  authRequiredTitle: 'Avtorizatsiya talab qilinadi',
+  authRequiredMessage: 'Buyurtmalaringizni ko\'rish uchun tizimga kiring',
+  notFound: 'Buyurtmalar topilmadi',
+  noneYet: 'Sizda hali buyurtmalar yo\'q',
+  tryAdjustSearch: 'Qidiruv shartlarini o\'zgartirib ko\'ring',
+  startShopping: 'Katalogimizdan xaridni boshlang',
+  resetFilters: 'Filtrlarni tiklash',
+  goToCatalog: 'Katalogga o\'tish',
+  status: {
+    CREATED: 'Yaratildi',
+    PENDING: 'Kutilmoqda',
+    PAID: 'To\'landi',
+    FAILED: 'Xato',
+    CANCELLED: 'Bekor qilindi',
+    REFUNDED: 'Qaytarildi',
+    confirmed: 'Tasdiqlandi',
+    pending: 'Kutilmoqda',
+    processing: 'Qayta ishlanmoqda',
+    shipped: 'Yuborildi',
+    delivered: 'Yetkazildi',
+    cancelled: 'Bekor qilindi'
+  }
+} as const;

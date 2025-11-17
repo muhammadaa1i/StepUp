@@ -70,17 +70,18 @@ export const AdminPrefetch = {
    */
   async prefetchDashboard() {
     try {
+      // Just get counts, not full lists
       const endpoints = [
-        API_ENDPOINTS.USERS,
-        API_ENDPOINTS.SLIPPERS,
-        API_ENDPOINTS.ORDERS,
+        { url: API_ENDPOINTS.USERS, params: { skip: 0, limit: 1 } },
+        { url: API_ENDPOINTS.SLIPPERS, params: { skip: 0, limit: 1, include_images: false } },
+        { url: API_ENDPOINTS.ORDERS, params: { skip: 0, limit: 1 } },
       ];
       
       await Promise.all(
-        endpoints.map(endpoint =>
+        endpoints.map(({ url, params }) =>
           modernApiClient.get(
-            endpoint,
-            { limit: 1 },
+            url,
+            params,
             { cache: true, timeout: 2000, retries: 0 }
           ).catch(() => {})
         )
@@ -91,16 +92,11 @@ export const AdminPrefetch = {
   },
 
   /**
-   * Prefetch all admin data
+   * Prefetch all admin data (use sparingly - only on dashboard)
    */
   async prefetchAll() {
-    // Run all prefetches in parallel, but don't wait for them
-    Promise.all([
-      this.prefetchDashboard(),
-      this.prefetchUsers(),
-      this.prefetchOrders(),
-      this.prefetchProducts(),
-      this.prefetchCategories(),
-    ]).catch(() => {});
+    // Only prefetch minimal data for dashboard stats
+    // Individual pages will load their full data when needed
+    this.prefetchDashboard().catch(() => {});
   },
 };
