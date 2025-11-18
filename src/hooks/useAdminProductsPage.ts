@@ -24,7 +24,6 @@ export function useAdminProductsPage() {
     showModal,
     setShowModal,
     editingProduct,
-    setEditingProduct,
     formData,
     setFormData,
     isSaving,

@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { BarChart3, Users, Package, ShoppingCart } from "lucide-react";
 import { useI18n } from "@/i18n";
-import { AdminPrefetch } from "@/lib/adminPrefetch";
 import AdminHeader from "./AdminHeader";
 import AdminNavigation from "./AdminNavigation";
 import MobileNavOverlay from "./MobileNavOverlay";

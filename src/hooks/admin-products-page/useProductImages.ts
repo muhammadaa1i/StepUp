@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { AdminProductService } from "@/services/adminProductService";
 import { ProductImage } from "./types";
 
-export function useProductImages(editingProductId: number | null) {
+export function useProductImages(_editingProductId: number | null) {
   const { t } = useI18n();
   const [multiImageFiles, setMultiImageFiles] = useState<FileList | null>(null);
   const [multiImagePreviews, setMultiImagePreviews] = useState<string[]>([]);

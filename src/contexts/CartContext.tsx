@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useRef, useState, startTransition } from "react";
-import { Slipper } from "@/types";
 import { useI18n } from "@/i18n";
 import { useAuth } from "@/contexts/AuthContext";
 import { CartItem } from "./cart/cartTransformers";

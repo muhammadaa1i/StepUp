@@ -14,8 +14,8 @@ export async function parseTokensFromResponse(resp: Response): Promise<TokenResu
   } catch {}
 
   const headers = resp.headers;
-  let access = extractAccessToken(body, headers);
-  let refresh = extractRefreshToken(body, headers);
+  const access = extractAccessToken(body, headers);
+  const refresh = extractRefreshToken(body, headers);
 
   return { access, refresh };
 }

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { AdminProductService } from "@/services/adminProductService";
 import { Slipper } from "@/types";
-import { ProductFormData, PaginationState } from "./types";
+import { PaginationState } from "./types";
 
 export function useProductActions(
   products: Slipper[],

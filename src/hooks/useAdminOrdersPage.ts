@@ -12,7 +12,7 @@ export function useAdminOrdersPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Order data fetching & pagination
-  const { orders, setOrders, isLoading, pagination, handlePageChange, handleLimitChange, fetchOrders } =
+  const { orders, setOrders, isLoading, pagination, handlePageChange, handleLimitChange } =
     useOrderData();
 
   // Refund dialog & actions

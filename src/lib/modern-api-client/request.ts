@@ -46,7 +46,7 @@ export class RequestExecutor {
             // Token refreshed successfully, retry the request
             return await this.makeRequest(endpoint, { ...options, _retry: true });
           }
-        } catch (refreshError) {
+        } catch {
           // Refresh failed, proceed to throw error
         }
       }

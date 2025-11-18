@@ -28,7 +28,7 @@ export function useModalImageUrls(product: Slipper | null) {
     
     if (!urls.length) urls.push('/placeholder-product.svg');
     return urls;
-  }, [product?.id, product?.images, product?.image]);
+  }, [product]);
 
   return images;
 }

@@ -2,7 +2,6 @@
  * Simplified update quantity operation
  */
 
-import { toast } from "react-toastify";
 import { User } from "@/types";
 import cartService from "@/services/cartService";
 import { CartItem, mapServerToClient, reconcilePartial } from "../cartTransformers";
