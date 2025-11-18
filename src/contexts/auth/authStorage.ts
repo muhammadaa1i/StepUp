@@ -34,7 +34,6 @@ export function loadAuthData(): { user: User | null; accessToken: string | null 
   
   if (localStorage.user && localStorage.accessToken) {
     // Restore to cookies
-    const options = getCookieOptions();
     setAuthCookies(localStorage.accessToken, localStorage.refreshToken || "", JSON.stringify(localStorage.user));
     
     return { user: localStorage.user, accessToken: localStorage.accessToken };

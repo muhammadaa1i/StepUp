@@ -9,6 +9,9 @@ import { PaymentEndpoints } from "@/lib/api/endpoints";
 import { parsePaymentResponse, PaymentResponse } from "./utils/paymentParser";
 import { calculatePaymentTimeout, isMobileDevice } from "./utils/deviceDetector";
 
+// Re-export PaymentResponse for external use
+export type { PaymentResponse } from "./utils/paymentParser";
+
 export interface PaymentRequest {
   amount: number;
   description: string;
