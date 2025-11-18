@@ -84,7 +84,13 @@ export const handle401 = async (
 
   if (hasAnyToken) {
     authManager.invalidateAuth();
-  } else if (isAdminEndpoint(endpoint) && isAdminPage()) {
+  }
+  
+  // Always redirect to login on admin pages when auth fails
+  if (isAdminPage()) {
+    redirectToLogin();
+  } else if (isAdminEndpoint(endpoint)) {
+    // Also redirect if it's an admin endpoint even from non-admin pages
     redirectToLogin();
   }
 

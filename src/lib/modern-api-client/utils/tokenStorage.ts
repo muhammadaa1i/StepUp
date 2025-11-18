@@ -24,5 +24,12 @@ export function storeTokens(tokens: TokenSet): boolean {
     Cookies.set("refresh_token", tokens.refresh, { ...cookieOptions, expires: 30 });
   }
   
+  // Emit event that token was refreshed successfully
+  if (typeof window !== "undefined" && tokens.access) {
+    window.dispatchEvent(new CustomEvent("auth:token-refreshed", { 
+      detail: { accessToken: tokens.access }
+    }));
+  }
+  
   return !!(tokens.access || tokens.refresh);
 }

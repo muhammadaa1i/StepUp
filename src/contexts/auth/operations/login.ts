@@ -29,10 +29,6 @@ export async function login({
 
     const resp = await apiClient.post(API_ENDPOINTS.LOGIN, credentials);
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Login Debug] Full response:', resp);
-    }
-    
     // Handle different response formats
     let responseData = resp.data || resp || {};
     
@@ -46,20 +42,7 @@ export async function login({
       user?: User;
     };
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Login Debug] Extracted tokens:', {
-        hasAccessToken: !!access_token,
-        hasRefreshToken: !!refresh_token,
-        hasUser: !!userData,
-      });
-    }
-
     if (!access_token || !refresh_token || !userData) {
-      console.error('[Login Error] Missing required fields:', {
-        access_token: !!access_token,
-        refresh_token: !!refresh_token,
-        userData: !!userData
-      });
       toast.error(t('auth.errors.invalidServerResponse'));
       throw new Error('invalid server response');
     }
@@ -72,8 +55,6 @@ export async function login({
       toast.success(t('auth.toasts.loginSuccess'));
     }, 100);
   } catch (error: unknown) {
-    console.error("[Login Error] Full error object:", error);
-    
     let errorMessage = t('auth.toasts.loginInvalid');
     
     if (error instanceof Error) {
@@ -105,7 +86,6 @@ export async function login({
       errorMessage = t('auth.serverMessages.incorrectCredentials');
     }
     
-    console.error("[Login Error] Final error message:", errorMessage);
     toast.error(errorMessage);
     throw error;
   } finally {

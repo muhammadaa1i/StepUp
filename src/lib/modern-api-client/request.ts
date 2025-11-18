@@ -43,11 +43,16 @@ export class RequestExecutor {
         try {
           const refreshed = await this.authManager.attemptRefresh(endpoint);
           if (refreshed) {
-            // Token refreshed successfully, retry the request
+            // Token refreshed successfully, retry the request WITHOUT marking as retry
+            // This allows the request to succeed with the new token
             return await this.makeRequest(endpoint, { ...options, _retry: true });
           }
         } catch {
-          // Refresh failed, proceed to throw error
+          // Refresh failed - redirect to login only if on admin page
+          if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) {
+            const currentPath = window.location.pathname + window.location.search;
+            window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}`;
+          }
         }
       }
       

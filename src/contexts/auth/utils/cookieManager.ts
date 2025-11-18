@@ -30,10 +30,6 @@ export function setAuthCookies(
     Cookies.set("access_token", accessToken, { ...options, expires: 1 });
     Cookies.set("refresh_token", refreshToken, { ...options, expires: 30 });
     Cookies.set("user", userJson, { ...options, expires: 7 });
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Auth Storage] Cookies set successfully');
-    }
   } catch (error) {
     console.error('[Auth Storage] Failed to set cookies:', error);
   }

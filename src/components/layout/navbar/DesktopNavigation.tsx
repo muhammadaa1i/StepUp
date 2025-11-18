@@ -29,7 +29,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
         const Icon = iconMap[item.icon];
         const isActive =
           item.href === "/admin"
-            ? pathname?.startsWith("/admin") || isAdmin // Keep green if admin, even on other pages
+            ? pathname?.startsWith("/admin")
             : pathname === item.href;
         return (
           <Link
