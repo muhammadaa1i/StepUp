@@ -1,7 +1,3 @@
-/**
- * Hook for initial cart load
- */
-
 import { useEffect } from "react";
 import { CartItem } from "./cartTransformers";
 import { saveToStorage, loadFromStorage } from "./cartStorage";
@@ -20,40 +16,41 @@ export function useCartInit({
 }: UseCartInitOptions) {
   useEffect(() => {
     let mounted = true;
-    let hasInitialized = false; // Prevent multiple initializations
+    let hasInitialized = false;
     
     const timeoutId = setTimeout(() => {
       if (hasInitialized) return;
       hasInitialized = true;
       
       (async () => {
+        // Only sync from server if authenticated
         if (isAuthenticated && hasValidToken()) {
           try {
             const mapped = await syncFromServer();
-            if (!mounted || !mapped) return;
+            if (!mounted) return;
             
             const prevForImages = loadFromStorage();
             const hasLocalItems = prevForImages.length > 0;
-            const hasServerItems = mapped.length > 0;
+            const hasServerItems = mapped && mapped.length > 0;
             
-            if (hasServerItems || !hasLocalItems) {
+            // Priority: Use server data if it has items
+            if (hasServerItems) {
               setItems(mapped);
               saveToStorage(mapped);
-            } else {
-              setItems(prevForImages);
+            } else if (!hasLocalItems && mapped) {
+              // Server returned empty and no local items - set empty
+              setItems(mapped);
+              saveToStorage(mapped);
             }
+            // If server is empty but we have local items, keep local (already loaded in initial state)
           } catch {
-            const savedCart = loadFromStorage();
-            if (mounted && savedCart.length > 0) {
-              setItems(savedCart);
+            // Server sync failed - keep local storage items (already loaded in initial state)
+            if (process.env.NODE_ENV === "development") {
+              console.log("Cart server sync failed, using local storage");
             }
-          }
-        } else {
-          const savedCart = loadFromStorage();
-          if (mounted && savedCart.length > 0) {
-            setItems(savedCart);
           }
         }
+        // If not authenticated, local storage items are already loaded in initial state
       })();
     }, 100);
     
@@ -61,7 +58,5 @@ export function useCartInit({
       mounted = false;
       clearTimeout(timeoutId);
     };
-    // Only run once on mount - ignore function changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

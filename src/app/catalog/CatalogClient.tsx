@@ -41,7 +41,7 @@ export default function CatalogClient({ initial }: Props) {
     // delay clearing to allow exit animation if added later
     setTimeout(() => setQuickViewProduct(null), 200);
   };
-
+  // Removed page-level "all products added" toast per request
   
 
   return (

@@ -59,10 +59,12 @@ export function useCartStorageSync({
         syncInProgress = true;
         setTimeout(() => {
           void syncFromServerRef.current().then(mapped => {
-            if (mapped) {
+            if (mapped && mapped.length > 0) {
+              // Only update if server has items
               setItemsRef.current(mapped);
               saveToStorage(mapped);
             }
+            // If server returns empty, keep local items
           }).finally(() => {
             syncInProgress = false;
           });

@@ -22,6 +22,7 @@ export const BrandSection: React.FC<BrandSectionProps> = ({
             width={48}
             height={48}
             className="object-contain"
+            style={{ width: 'auto', height: 'auto' }}
           />
         </div>
         <div className="flex flex-col">

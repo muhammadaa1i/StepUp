@@ -2,6 +2,7 @@
  * Simplified update quantity operation
  */
 
+import { toast } from "react-toastify";
 import { User } from "@/types";
 import cartService from "@/services/cartService";
 import { CartItem, mapServerToClient, reconcilePartial } from "../cartTransformers";
@@ -16,7 +17,7 @@ interface UpdateQuantityOptions {
   items: CartItem[];
   itemsRef: React.MutableRefObject<CartItem[]>;
   setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
-  t: (key: string) => string;
+  t: (key: string, vars?: Record<string, string>) => string;
 }
 
 export function updateQuantity(options: UpdateQuantityOptions) {
@@ -31,6 +32,19 @@ export function updateQuantity(options: UpdateQuantityOptions) {
 
   const isIncrease = quantity > cartItem.quantity;
   const snapped = snapQuantityToPackSize(quantity, isIncrease);
+
+  // Validate stock availability when increasing
+  if (isIncrease && cartItem.availableStock !== undefined) {
+    if (snapped > cartItem.availableStock) {
+      toast.error(
+        t("cart.insufficientStock", { 
+          name: cartItem.name, 
+          available: cartItem.availableStock.toString() 
+        })
+      );
+      return;
+    }
+  }
 
   // Optimistic update
   setItems((prev) => prev.map((i) => (i.id === productId ? { ...i, quantity: snapped } : i)));
@@ -63,7 +77,13 @@ async function syncQuantityWithServer(
       setItems(mapped);
       saveToStorage(mapped);
     }
-  } catch {
-    console.error("Failed to sync quantity with server");
+  } catch (err) {
+    // Reduce console noise: only warn for non-auth/non-timeout errors
+    const msg = (err as Error)?.message || "";
+    const isAuth = msg.includes("401") || msg.includes("Unauthorized") || msg.includes("Authentication required");
+    const isTimeout = msg.includes("timeout") || msg.includes("408");
+    if (!isAuth && !isTimeout) {
+      console.warn("Failed to sync quantity with server");
+    }
   }
 }

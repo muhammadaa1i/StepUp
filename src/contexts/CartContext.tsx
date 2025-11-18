@@ -11,13 +11,23 @@ import { useCartEvents } from "./cart/useCartEvents";
 import { useCartStorageSync } from "./cart/useCartStorageSync";
 import { useCartHelpers } from "./cart/useCartHelpers";
 import { createCartOperations } from "./cart/cartOperations";
-import { saveToStorage } from "./cart/cartStorage";
+import { saveToStorage, loadFromStorage } from "./cart/cartStorage";
 import { buildContextValue, CartContextType } from "./cart/contextBuilder";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Initialize cart from localStorage immediately to prevent flash of empty cart
+function getInitialCartItems(): CartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return loadFromStorage();
+  } catch {
+    return [];
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(getInitialCartItems);
   const itemsRef = useRef<CartItem[]>([]);
   const suppressHydrationRef = useRef<number>(0);
   const { t } = useI18n();

@@ -31,9 +31,12 @@ export function useCartEnrichment({
     const current = itemsRef.current;
     if (!current || current.length === 0) return;
 
-    // Identify items that need enrichment (no image and no images array)
+    // Identify items that need enrichment (no image/images OR no stock info)
     const needs = current
-      .filter((it) => (!it.image && (!it.images || it.images.length === 0)))
+      .filter((it) => 
+        (!it.image && (!it.images || it.images.length === 0)) || 
+        it.availableStock === undefined
+      )
       .map((it) => it.id)
       .filter((id) => !enrichedIdsRef.current.has(id));
 
@@ -77,22 +80,28 @@ export function useCartEnrichment({
         const firstImage = product.image || (mappedImages[0]?.image_url ?? "");
         
         if ((it.image && it.image.length > 0) || (it.images && it.images.length > 0)) {
-          return it;
+          // Update stock even if images exist
+          return {
+            ...it,
+            availableStock: product.quantity || 0,
+          };
         }
         
         return {
           ...it,
           image: it.image || firstImage,
           images: (it.images && it.images.length > 0) ? it.images : mappedImages,
+          availableStock: product.quantity || 0,
         };
       });
 
-      // Only update state if there are changes (some items gained images)
+      // Only update state if there are changes (some items gained images or stock)
       const changed = updated.some((u, ix) => {
         const prev = itemsRef.current[ix];
-        const prevHas = !!(prev?.image) || (prev?.images && prev.images.length > 0);
-        const nowHas = !!(u?.image) || (u?.images && u.images.length > 0);
-        return nowHas && !prevHas;
+        const prevHasImages = !!(prev?.image) || (prev?.images && prev.images.length > 0);
+        const nowHasImages = !!(u?.image) || (u?.images && u.images.length > 0);
+        const stockChanged = prev?.availableStock !== u?.availableStock;
+        return (nowHasImages && !prevHasImages) || stockChanged;
       });
 
       if (changed) {

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { toast } from "react-toastify";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import ProductImage from "@/components/products/ProductImage";
 import { formatPrice } from "@/lib/utils";
@@ -12,6 +13,7 @@ export interface CartItemShape {
   image?: string;
   size?: string;
   color?: string;
+  availableStock?: number;
 }
 
 interface Props {
@@ -26,6 +28,9 @@ interface Props {
 export default function CartItemRow({ item, index, total, onUpdate, onRemove, t }: Props) {
   const dec = () => onUpdate(item.id, item.quantity - 6);
   const inc = () => onUpdate(item.id, item.quantity + 6);
+  
+  const canDecrease = item.quantity > 60;
+  const canIncrease = item.availableStock === undefined || (item.quantity + 6 <= item.availableStock);
 
   return (
     <div
@@ -60,8 +65,8 @@ export default function CartItemRow({ item, index, total, onUpdate, onRemove, t 
             <div className="flex items-center space-x-1 sm:space-x-2">
               <button
                 onClick={dec}
-                className="p-1 rounded-md border border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-700 hover:text-gray-900 transition-colors"
-                disabled={item.quantity <= 60}
+                className="p-1 rounded-md border border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-700 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!canDecrease}
               >
                 <Minus className="h-3 sm:h-4 w-3 sm:w-4" />
               </button>
@@ -69,8 +74,28 @@ export default function CartItemRow({ item, index, total, onUpdate, onRemove, t 
                 {item.quantity}
               </span>
               <button
-                onClick={inc}
-                className="p-1 rounded-md border border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-700 hover:text-gray-900 transition-colors"
+                onClick={() => {
+                  if (canIncrease) {
+                    const nextQty = item.quantity + 6;
+                    inc();
+                    // If this increment reaches or exceeds the available stock, inform the user once
+                    if (
+                      typeof item.availableStock === 'number' &&
+                      nextQty >= item.availableStock
+                    ) {
+                      toast.info(t('cart.limitReached'));
+                    }
+                  } else {
+                    toast.info(t('cart.limitReached'));
+                  }
+                }}
+                aria-disabled={!canIncrease}
+                className={`p-1 rounded-md border transition-colors ${
+                  canIncrease
+                    ? "border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-700 hover:text-gray-900"
+                    : "border-gray-200 text-gray-400 cursor-not-allowed opacity-50"
+                }`}
+                title={!canIncrease && item.availableStock !== undefined ? t("product.insufficientStock") : undefined}
               >
                 <Plus className="h-3 sm:h-4 w-3 sm:w-4" />
               </button>

@@ -80,13 +80,14 @@ export const ProductCardDetails: React.FC<ProductCardDetailsProps> = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                // Allow click even when visually disabled so we can show a toast in catalog
                 onIncrease(e);
               }}
               className={`p-1 rounded border text-xs transition-colors ${canIncrease
                   ? "border-emerald-300 text-emerald-700 hover:bg-emerald-50"
                   : "border-gray-200 text-gray-400 cursor-not-allowed opacity-50"
                 }`}
-              disabled={!canIncrease}
+              aria-disabled={!canIncrease}
               title={!canIncrease ? t("product.insufficientStock") : undefined}
             >
               <Plus className="h-3 w-3" />

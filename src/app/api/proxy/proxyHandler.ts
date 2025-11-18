@@ -10,14 +10,25 @@ export async function proxy(request: NextRequest, method: "GET" | "POST" | "PUT"
   const url = buildTargetUrl(endpoint, searchParams);
 
   try {
-    // Body + headers
     const incomingContentType = request.headers.get("content-type") || "";
     const isMultipart = incomingContentType.includes("multipart/form-data");
     const headers = forwardHeaders(request, { isMultipart, includeContentType: method !== "GET" && method !== "DELETE" });
 
     let body: BodyInit | null = null;
     if (method === "POST" || method === "PUT") {
-      body = isMultipart ? await request.formData() : await request.text();
+      if (isMultipart) {
+        body = await request.formData();
+      } else {
+        const text = await request.text();
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            body = JSON.stringify(parsed);
+          } catch {
+            body = text;
+          }
+        }
+      }
     }
 
     const response = await fetch(url.toString(), {

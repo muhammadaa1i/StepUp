@@ -13,6 +13,7 @@ export interface CartItem {
   image?: string;
   size?: string;
   color?: string;
+  availableStock?: number; // Available stock quantity for validation
   _cartItemId?: number; // backend cart_item id
 }
 
@@ -40,6 +41,7 @@ export function mapServerToClient(cart: CartDTO, prevItems: CartItem[]): CartIte
         quantity: Number(it.quantity || 0),
         images: prevMatch?.images || [],
         image: prevMatch?.image,
+        availableStock: prevMatch?.availableStock, // Preserve stock info
         _cartItemId: it.id,
       };
       itemsMap.set(it.slipper_id, mapped);

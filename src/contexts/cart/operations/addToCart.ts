@@ -44,18 +44,24 @@ export function addToCart(options: AddToCartOptions) {
     quantity: finalQty,
     images: fallbackImages,
     image: product.image,
+    availableStock: product.quantity || 0,
     _cartItemId: undefined,
   };
   
-  // Optimistic update
+  // Prevent duplicate distinct add - show info toast instead
+  if (itemsRef.current.some(i => i.id === product.id)) {
+    toast.info(t('cart.alreadyInCartAddMore'));
+    return;
+  }
+
+  // Optimistic update + persist immediately
   setItems((prev) => {
-    const existing = prev.find((i) => i.id === product.id);
-    if (existing) return prev;
-    return [...prev, newItem];
+    const next = [...prev, newItem];
+    try { saveToStorage(next); } catch { /* ignore */ }
+    return next;
   });
-  
+
   toast.success(t("cart.added", { name: product.name, qty: finalQty.toString() }));
-  setTimeout(() => saveToStorage(itemsRef.current), 0);
 
   // Sync with server
   if (isAuthenticated) {
@@ -83,13 +89,22 @@ async function syncAddWithServer(
     setItems(mapped);
     saveToStorage(mapped);
   } catch (error) {
+    // Silently handle auth errors (401) and timeout errors (408)
+    // User already has item in local cart, no need to show error
     const isAuthError = error instanceof Error && 
       (error.message.includes('401') || 
        error.message.includes('Unauthorized') ||
        error.message.includes('Authentication required'));
     
-    if (!isAuthError) {
-      toast.error(t("errors.serverErrorLong"));
+    const isTimeoutError = error instanceof Error &&
+      (error.message.includes('408') ||
+       error.message.includes('timeout') ||
+       error.message.includes('Request timeout'));
+    
+    // Only show error for unexpected server errors
+    if (!isAuthError && !isTimeoutError) {
+      console.error('Cart sync failed:', error);
+      // Don't show toast - item is already in local cart
     }
   }
 }

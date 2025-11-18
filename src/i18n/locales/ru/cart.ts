@@ -3,6 +3,8 @@ export const cart = {
   addToCart: 'В корзину',
   addMore: 'Добавить ещё',
   alreadyInCartAddMore: 'Товар уже в корзине. Нажмите чтобы добавить ещё',
+  limitReached: 'Достигнуто максимальное количество для этого товара',
+  allProductsAdded: 'Все товары на этой странице каталога уже добавлены в корзину',
   addToCartHint: 'Добавить в корзину',
   added: '{name}: +{qty} единиц добавлено',
   removed: '{name}: удалён',

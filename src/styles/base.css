@@ -25,10 +25,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth scrolling */
-html {
+/* Smooth scrolling - disabled for Next.js compatibility */
+/* Next.js will handle scroll behavior during route transitions */
+/* html {
   scroll-behavior: smooth;
-}
+} */
 
 /* Modern focus styles */
 *:focus {

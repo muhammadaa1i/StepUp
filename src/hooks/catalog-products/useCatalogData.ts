@@ -45,8 +45,8 @@ export function useCatalogData(t: (key: string) => string, initialProducts: Slip
       const response = await modernApiClient.get(API_ENDPOINTS.SLIPPERS, params, {
         cache: true,
         ttl: 180000, // 3 minutes cache
-        timeout: 4000, // Faster timeout
-        retries: 0, // No retries to avoid rate limiting (429)
+        timeout: 9000, // Increase timeout to reduce false timeouts on slow networks
+        retries: 1, // One light retry for resiliency
       });
       if (!mountedRef.current) return;
       const arrayData = extractArray(response);
@@ -86,7 +86,8 @@ export function useCatalogData(t: (key: string) => string, initialProducts: Slip
         return;
       }
       
-      console.error("Error fetching products:", err);
+  // Downgrade to warn to avoid alarming devtools with red errors during flaky networks
+  console.warn("Error fetching products:", err);
       setErrorStatus(apiErr.status);
       setHasError(true);
       setErrorMessage(apiErr.message || t("errors.productsLoad"));

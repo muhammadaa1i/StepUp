@@ -75,6 +75,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  async redirects() {
+    return [
+      // Prevent 404 when browsers request /favicon.ico
+      {
+        source: "/favicon.ico",
+        destination: "/favicon.svg",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withAnalyzer(nextConfig);

@@ -3,6 +3,8 @@ export const cart = {
   addToCart: 'Savatga',
   addMore: 'Yana qo\'shish',
   alreadyInCartAddMore: 'Mahsulot allaqachon savatda. Yana qo\'shish uchun bosing',
+  limitReached: 'Bu mahsulot uchun maksimal miqdorga yetdingiz',
+  allProductsAdded: 'Bu sahifadagi barcha mahsulotlar savatga qo\'shilgan',
   addToCartHint: 'Savatga qo\'shish',
   added: '{name}: +{qty} birlik qo\'shildi',
   removed: '{name}: o\'chirildi',

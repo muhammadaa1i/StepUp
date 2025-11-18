@@ -22,22 +22,21 @@ function isExpiredJwt(token: string, skewMs = 30_000): boolean {
   return expMs <= nowMs + skewMs; // Consider near-expiry as expired to avoid race
 }
 
+/**
+ * Returns true only if a syntactically valid, non-expired access token exists.
+ * We proactively treat near-expiry tokens as expired to avoid 401 noise.
+ */
 export function hasValidToken(): boolean {
   if (typeof window === "undefined") return false;
 
   const accessToken = Cookies.get("access_token");
 
-  // At minimum, we need an access token
-  if (!accessToken) {
+  // Must exist and look like a JWT
+  if (!accessToken || accessToken.length < 10 || !accessToken.includes(".")) {
     return false;
   }
 
-  // Basic token format validation (should be a JWT-like string)
-  if (accessToken.length < 10 || !accessToken.includes('.')) {
-    return false;
-  }
-
-  // Prevent calls with clearly expired tokens
+  // Consider token invalid if expired or close to expiry
   if (isExpiredJwt(accessToken)) {
     return false;
   }
@@ -62,7 +61,7 @@ export function clearInvalidTokens() {
   const refreshToken = Cookies.get("refresh_token");
   
   // Remove tokens if they appear invalid
-  if (accessToken && (accessToken.length < 10 || !accessToken.includes('.'))) {
+  if (accessToken && (accessToken.length < 10 || !accessToken.includes('.') || isExpiredJwt(accessToken))) {
     Cookies.remove("access_token");
   }
   
